@@ -1,1 +1,1 @@
-# aws-script
+# AWS Script
