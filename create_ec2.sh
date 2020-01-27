@@ -1,5 +1,5 @@
 #!/bin/bash
-echo -e "\e[33m ========= | AWS Script Project | =========\033[0m"
+echo -e "AWS Script Project"
 echo ""
 echo ""
 
@@ -9,54 +9,34 @@ sub_id="subnet-0a71f7b4a74cd4461"
 route_table="rtb-0aaa0300e54d7167d"
 internet_gateway="igw-0b860335a9969ee3e"
 sec_id="sg-017520df651c90bea"
-aws_image_id="ami-41e9c52e"
+aws_image_id="ami-0ec49d80d3f7f4bb0"
 i_type="t2.micro"
 tag="Adagonese"
-aws_key_name="devenv-key"
-ssh_key="devenv-key.pem"
+aws_key_name="MyKeyPair"
+ssh_key="MyKeyPair.pem"
 uid=$RANDOM
 
-# Generate AWS Keys and store in this local box
-echo -e "\e[32m Generating key Pairs\033[0m"
-aws ec2 create-key-pair --key-name devenv-key --query 'KeyMaterial' --output text 2>&1 | tee $ssh_key
-
-#Set read only access for key
-echo "Setting permissions"
-chmod 400 $ssh_key
+# Generate AWS Keys, store locally, and set R/O permissions
+if [ ! -f MyKeyPair.pem ]; then
+  echo -e "Generating key Pairs"
+  aws2 ec2 create-key-pair --key-name MyKeyPair --query 'KeyMaterial' --output text > MyKeyPair.pem
+  echo "Setting permissions"
+  chmod 600 $ssh_key
+  aws2 ec2 describe-key-pairs --key-name MyKeyPair
+fi
 
 echo "Creating EC2 instance in AWS"
+instance_data=$(aws2 ec2 run-instances --image-id ami-0ec49d80d3f7f4bb0 --count 1 --instance-type t2.micro --key-name MyKeyPair --security-group-ids sg-017520df651c90bea --subnet-id subnet-0a71f7b4a74cd4461 --associate-public-ip-address --user-data file://install_rails --tag-specifications 'ResourceType=instance,Tags=[{Key=webserver,Value=rails17}]')
 
-ec2_id=$(aws ec2 run-instances --image-id $aws_image_id --count 1 --instance-type $i_type --key-name $aws_key_name --security-group-ids $sec_id --subnet-id $sub_id --associate-public-ip-address  --tag-specifications 'ResourceType=instance,Tags=[{Key=WatchTower,Value="$tag"},{Key=AutomatedID,Value="$uid"}]' | grep InstanceId | cut -d":" -f2 | cut -d'"' -f2)
-
-# Log date, time, random ID. This may come handy in the future for troubleshooting
-date >> logs.txt
-#pwd >> logs.txt
-echo $ec2_id >> logs.txt
-echo ""
-
-echo -e "\t\033[0;31mEC2 Instance ID: $ec2_id\033[0m"
 #echo "Unique ID: $uid"
-elastic_ip=$(aws ec2 describe-instances --instance-ids $ec2_id --query 'Reservations[0].Instances[0].PublicIpAddress' | cut -d'"' -f2)
-echo -e "\t \033[0;31mElastic IP: $elastic_ip\033[0m"
-echo $elastic_ip >> logs.txt
-echo "=====" >> logs.txt
+elastic_ip=$(aws2 ec2 describe-instances --filter 'Name=tag:webserver,Values=rails17' --query 'Reservations[0].Instances[0].PublicIpAddress' | cut -d'"' -f2)
+echo "Elastic IP: $elastic_ip"
 
-echo ""
-countdown_timer=60
-echo -e "\e[32m Please wait while your instance is being powered on..We are trying to ssh into the EC2 instance\033[0m"
-echo -e "\e[32m Copy/paste the below command to acess your EC2 instance via SSH from this machine. You may need this later.\033[0m"
-echo ""
-echo -e "\033[0;31m         ssh -i $ssh_key ubuntu@$elastic_ip\033[0m"
-
-
-temp_cnt=${countdown_timer}
-while [[ ${temp_cnt} -gt 0 ]];
-do
-    printf "\rYou have %2d second(s) remaining to hit Ctrl+C to cancel that operation!" ${temp_cnt}
-    sleep 1
-    ((temp_cnt--))
-done
+echo "Booting up your instance... hang tight!"
+sleep 30
 echo ""
 
-
-ssh -i $ssh_key ubuntu@$elastic_ip
+echo "Now, give us about 10 minutes to load, and then visit $elastic_ip:3000 in your browser!"
+echo ""
+echo "Want to get your hands dirty? Copy/paste the below to SSH into your machine:"
+echo "ssh -i $ssh_key ec2-user@$elastic_ip"
