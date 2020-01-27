@@ -4,28 +4,14 @@ set -eu
 pwd
 whoami
 export HOME=/root
-# To run Rails 5 we want the latest ruby version
-# so we need to use amazon linux extras
 sudo amazon-linux-extras install -y ruby2.6
-# ruby-devel           - needed to compile ruby gem
-# xml2, xstl and patch - is for nokogiri
-# redhat-rpm-config    - in order to install native extensions with gems
-# sqlite-devel         - default database thats configured with Rails
 sudo yum install -y @"Development Tools"
 sudo yum install -y ruby-devel libxml2 libxml2-devel libxslt libxslt-devel patch redhat-rpm-config sqlite-devel
-# Extra Packages for Enterprise Linux (EPEL)
-# sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-# sudo yum-config-manager --enable epel
-# Rails required a Javascript Runtime because of of execjs
-# Not in Amazon's repo so using epel to install
-# https://github.com/rails/execjs
 curl -sL https://rpm.nodesource.com/setup_12.x | sudo -E bash -
 sudo yum install -y nodejs npm
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
 sudo yum install yarn -y
-# Required to use Rails, installs all gems in a Rails project
 gem install bundler
-# Install Rails
 gem install rails --version 5.2.4
 cd /root
 rails new --skip-spring example
