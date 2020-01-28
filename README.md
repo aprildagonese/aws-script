@@ -86,6 +86,7 @@ I noticed that my IAM user didn't have access to subscriptions in the AWS Market
 
   - Research faster approaches for testing changes without running through the full load process every time
   - Spend a few minutes doing high-level research on alternative frameworks that install easily onto EC2 with little configuration
+  - Automated testing. Is that a thing for a script like this? I'd look into that, too
   - Not accidentally commit a key pair to Github (sorry! I deleted it.)
 
 Thank you so much for the opportunity to complete this project! I had so much fun doing it!
