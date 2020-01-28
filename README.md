@@ -4,13 +4,10 @@ This project is a bash script that spins up an EC2 instance loaded with the defa
 
 ## Prerequisites
 
-Version 2 of the AWS CLI is required to run this script, and it must be configured with an IAM user that has permissions to launch an EC2 instance in your account.
-
-CLI installation instructions are available [here](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux-mac.html#cliv2-linux-mac-remove).
-
-Instructions for configuring the AWS CLI with your user are available [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
-
-The script also assumes that you have an existing VPC with a public subnet, a route pointing to an Internet Gateway, and a default Security Group and NACL allowing all incoming/outgoing traffic from the public internet.
+  1. Version 2 of the AWS CLI is required to run this script, and it must be configured with an IAM user that has permissions to launch an EC2 instance in your account.
+      - CLI installation instructions are available [here](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux-mac.html#cliv2-linux-mac-remove).
+      - Instructions for configuring the AWS CLI with your user are available [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
+  2. The script also assumes that you have an existing VPC with a public subnet, a route pointing to an Internet Gateway, and a default Security Group and NACL allowing all incoming/outgoing traffic from the public internet.
 
 ## Instructions
 
@@ -43,9 +40,7 @@ After booting your instance, the script is set to load Rails version 5.2.4 and R
 
 To follow along with the Rails install once the instance has booted up:
   1. Copy the SSH instructions that the script will output for you. It will look like this: `ssh -i MyKeyPair.pem ec2-user@[YOUR SPECIFIC ELASTIC IP]`
-
   2. When asked for confirmation that you want to connect, answer `yes`
-
   3. Once connected, run `tail -f /tmp/part-001.log` to watch the output of the Rails install
 
 ## Project Instructions
@@ -68,7 +63,7 @@ To follow along with the Rails install once the instance has booted up:
 
 ## Project Approach & Assumptions
 
-When deciding my general approach to the project, I tried to be very conscious of the 3-hour time limit given in the instructions. While I've used templating tools with AWS in the past, I've never had to start them from scratch, and I was nervous about losing too much time just on setup. I knew I could spin up resources quickly using either the console or the CLI, so I created my network environment by hand in the console and decided to write the script itself using bash and the AWS CLI. Even though it's still technically in beta, I went with version 2 of the CLI because it's so much faster and easier to install than version 1, and it had worked well for me in the past. In terms of frameworks, I have the most experience setting up Rails, so that seemed like an easy choice.
+When deciding my general approach to the project, I tried to be very conscious of the 3-hour time limit given in the instructions. While I've used templating tools with AWS in the past, I've never had to start them from scratch, and I was nervous about losing too much time just on setup. I knew I could spin up resources quickly using either the console or the CLI, so I created my network environment by hand in the console and decided to write the script itself using bash and the AWS CLI. Even though it's still technically in beta, I went with version 2 of the CLI because it's so much faster and easier to install than version 1, and it had worked well for me in the past. In terms of frameworks, I have the most experience setting up Rails, so that seemed like an easy choice at the time.
 
 Early on, my plan looked like this:
 
@@ -91,3 +86,6 @@ I noticed that my IAM user didn't have access to subscriptions in the AWS Market
 
   - Research faster approaches for testing changes without running through the full load process every time
   - Spend a few minutes doing high-level research on alternative frameworks that install easily onto EC2 with little configuration
+  - Not accidentally commit a key pair to Github (sorry! I deleted it.)
+
+Thank you so much for the opportunity to complete this project! I had so much fun doing it!
