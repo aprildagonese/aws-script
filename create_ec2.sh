@@ -15,7 +15,7 @@ aws_key_pair="MyKeyPair"
 ssh_key="MyKeyPair.pem"
 uid=$RANDOM
 
-# Generate AWS Keys, store locally, and set permissions
+# Generate AWS Keys & set permissions
 if [ ! -f MyKeyPair.pem ]; then
   echo -e "Generating key Pairs"
   aws2 ec2 create-key-pair --key-name MyKeyPair --query 'KeyMaterial' --output text > MyKeyPair.pem
@@ -24,7 +24,7 @@ if [ ! -f MyKeyPair.pem ]; then
   aws2 ec2 describe-key-pairs --key-name MyKeyPair
 fi
 
-echo "Creating EC2 instance in AWS"
+# Create the instance
 instance_data=$(aws2 ec2 run-instances --image-id $aws_image_id --count 1 --instance-type $instance_type --key-name $aws_key_pair --security-group-ids $security_group_id --subnet-id $subnet_id --associate-public-ip-address --user-data file://install_rails --tag-specifications "ResourceType=instance,Tags=[{Key=webserver,Value=$tag}]")
 
 echo "Booting up your instance... hang tight!"
@@ -32,7 +32,6 @@ sleep 15
 echo ""
 
 elastic_ip=$(aws2 ec2 describe-instances --filter "Name=tag:webserver,Values=$tag" --query 'Reservations[0].Instances[0].PublicIpAddress' | cut -d'"' -f2)
-echo "Elastic IP: $elastic_ip"
 
 echo "Now, give us about 10 minutes to finish loading Rails, and then visit $elastic_ip:3000 in your browser!"
 echo ""
